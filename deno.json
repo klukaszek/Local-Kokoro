@@ -1,0 +1,19 @@
+{
+  "compilerOptions": {
+    "lib": ["dom", "dom.iterable", "dom.asynciterable", "deno.ns"],
+    "strict": true,
+    "types": ["@webgpu/types"]
+  },
+  "imports": {
+    "@bufbuild/buf": "npm:@bufbuild/buf@^1.49.0",
+    "@bufbuild/protobuf": "npm:@bufbuild/protobuf@^2.2.3",
+    "@bufbuild/protoc-gen-es": "npm:@bufbuild/protoc-gen-es@^2.2.3",
+    "@petamoriken/float16": "jsr:@petamoriken/float16@^3.9.1",
+    "@std/fs": "jsr:@std/fs@^1.0.9",
+    "@std/path": "jsr:@std/path@^1.0.8",
+    "@std/webgpu": "jsr:@std/webgpu@^0.224.7",
+    "@webgpu/types": "npm:@webgpu/types@^0.1.52",
+    "onnxruntime-web": "npm:onnxruntime-web@^1.21.0-dev.20250111-73f5b0c597"
+  },
+  "nodeModulesDir": "auto"
+}
