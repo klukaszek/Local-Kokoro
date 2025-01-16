@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "lib": ["dom", "dom.iterable", "dom.asynciterable", "deno.ns"],
+    "lib": ["dom", "dom.iterable", "dom.asynciterable", "deno.ns", "deno.unstable"],
     "strict": true,
     "types": ["@webgpu/types"]
   },
@@ -15,5 +15,10 @@
     "@webgpu/types": "npm:@webgpu/types@^0.1.52",
     "onnxruntime-web": "npm:onnxruntime-web@^1.21.0-dev.20250111-73f5b0c597"
   },
-  "nodeModulesDir": "auto"
+  "nodeModulesDir": "auto",
+  "tasks": {
+    "start": "deno run --config ./deno.json --allow-read --allow-write --allow-net --allow-env src/main.ts",
+    "dev": "deno run --allow-net --allow-read --watch server.ts",
+    "build": "deno bundle frontend/src/main.ts frontend/dist/bundle.js"
+  }
 }

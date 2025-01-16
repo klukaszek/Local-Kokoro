@@ -1,36 +1,46 @@
 import { KokoroTTS } from "./inference/model.ts";
 import { WebGPUDevice } from "./webgpu/device.ts";
-import { HuggingFaceLoader } from "./loaders/huggingface.ts";
-import { InferenceSession } from "onnxruntime-web"
-
-export default { fetch };
+import { ONNXLoader } from "./loaders/onnx.ts";
+import * as onnxruntime from "onnxruntime-web"
 
 async function main() {
-    try {
-        // Initialize WebGPU
-        //const device = await WebGPUDevice.init();
+  try {
+    //const device = await WebGPUDevice.init();
+    
+    // We give our model a name (ID) and pass it to the ONNXLoader for caching purposes
+    const loader = new ONNXLoader("hexgrad/Kokoro-82M");
+    
+    // The ONNXFile object contains the filename, URL, and checksum of the ONNX
+    const info = {
+      "filename": "model_q8f16.onnx",
+      "url":
+        "https://huggingface.co/onnx-community/Kokoro-82M-ONNX/resolve/main/onnx/model_q8f16.onnx", // Use the quantized model from Xenova
+      "sha256":
+        "6e4e74139c6f1445f34428cad44206e8bdc7c4d703954d3248f5865c03379f86",
+    };
+    
+    // Fetch the weights from the URL and parse them into
+    const rawWeights = await loader.fetchWeights(info);
 
-        const loader = new HuggingFaceLoader();
-        const onnxModel = await loader.loadONNX([
-            {
-                "filename": "kokoro-v0_19.onnx",
-                "url":
-                    "https://huggingface.co/hexgrad/Kokoro-82M/blob/main/kokoro-v0_19.onnx",
-                "sha256":
-                    "ebef42457f7efee9b60b4f1d5aec7692f2925923948a0d7a2a49d2c9edf57e49",
-            },
-        ]);
-
-        //console.log("ONNX: ", onnxModel);
-
-        console.log("Model Parsed!");
-        //return model;
-    } catch (error) {
-        console.error("Failed to initialize:", error);
-        throw error;
+    // The rawWeights are then parsed into an ONNXModel object based on the ONNX protobuf schema
+    const onnxModel = loader.parseWeights(rawWeights);
+    if (!onnxModel) {
+      throw new Error("Failed to parse ONNX model");
     }
+
+    //onnxruntime.InferenceSession.create('./.cache/hexgrad/Kokoro-82M/kokoro-v0_19.onnx').then((session) => {
+    //    console.log("Session Created!");
+    //    });
+
+    //console.log("onnxModel:", onnxModel);
+
+    console.log("Model Parsed!");
+  } catch (error) {
+    console.error("Failed to initialize:", error);
+    throw error;
+  }
 }
 
 if (import.meta.main) {
-    main();
+  main();
 }
