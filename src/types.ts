@@ -1,8 +1,9 @@
 import { Float16Array } from "@petamoriken/float16";
+import { GraphProto } from "./gen/onnx_pb.ts";
 
-export interface ONNXFile {
+export interface FetchedFile {
     filename: string;
-    sha256: string;
+    sha256?: string;
     url: string;
     size?: number;
 }
@@ -15,5 +16,5 @@ export interface ONNXWeight {
 
 export interface ONNXModel {
     weights: { [key: string]: ONNXWeight };
-    graph: any; // The complete graph information if needed
+    graph: GraphProto; // The complete graph information if needed
 }

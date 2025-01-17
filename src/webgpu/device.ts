@@ -1,8 +1,7 @@
-// @ts-types="@webgpu/types"
 import { GPUBuffer, GPUBufferUsageFlags, GPUDevice } from '@webgpu/types';
 
 export class WebGPUDevice {
-    device: GPUDevice;
+    public device: GPUDevice;
     
     static async init(): Promise<WebGPUDevice> {
         if (!navigator.gpu) {
@@ -15,6 +14,8 @@ export class WebGPUDevice {
         }
 
         const device = await adapter.requestDevice();
+
+
         return new WebGPUDevice(device);
     }
 

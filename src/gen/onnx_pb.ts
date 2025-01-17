@@ -8,9 +8,9 @@
 // @generated from file onnx.proto (package onnx, syntax proto3)
 /* eslint-disable */
 
-import type { GenEnum, GenFile, GenMessage } from "@bufbuild/protobuf/codegenv1";
-import { enumDesc, fileDesc, messageDesc } from "@bufbuild/protobuf/codegenv1";
-import type { Message } from "@bufbuild/protobuf";
+import type { GenEnum, GenFile, GenMessage } from "npm:@bufbuild/protobuf/codegenv1";
+import { enumDesc, fileDesc, messageDesc } from "npm:@bufbuild/protobuf/codegenv1";
+import type { Message } from "npm:@bufbuild/protobuf";
 
 /**
  * Describes the file onnx.proto.
