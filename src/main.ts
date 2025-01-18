@@ -1,89 +1,59 @@
-//import { KokoroTTS } from "./inference/model.ts";
-import { WebGPUDevice } from "./webgpu/device.ts";
-import { ONNXLoader } from "./loaders/onnx.ts";
 import * as ort from "npm:onnxruntime-web/webgpu";
+import { render, h } from "npm:preact";
+import { App } from "./ui/App.tsx";
+import { fetchVoices } from "./voices.ts";
 import { Fetcher } from "./loaders/files.ts";
-import { VOICES_FILES } from "./voices.ts";
+import { ONNXLoader } from "./loaders/onnx.ts";
+import { updateProgress } from "./ui/state/progress.ts";
+import { KokoroContext, createKokoroContext } from "./types.ts";
+
+render(h(App, {}), document.getElementById("app")!);
+
+export const CONTEXT: KokoroContext = createKokoroContext();
 
 (async function init() {
-  try {
-    // We give our model a name (ID) and pass it to the ONNXLoader for caching purposes
-    const loader = new ONNXLoader("hexgrad/Kokoro-82M");
+    try {
+        // Initialize ONNXLoader
+        const loader = new ONNXLoader("hexgrad/Kokoro-82M");
 
-    // The File object contains the filename, URL, and checksum of the ONNX
-    const model_file = {
-      "filename": "model_q8f16.onnx",
-      "url":
-        "https://huggingface.co/onnx-community/Kokoro-82M-ONNX/resolve/main/onnx/model_uint8f16.onnx", // Use the quantized model from Xenova
-      "sha256":
-        "071acda679aaa31dcd551c57dabb99190f5e126b2f76bf88621dfe69b2aa9a2d",
-    };
+        // Define the model file
+        const model_file = {
+            "filename": "model_q8f16.onnx",
+            "url": "https://huggingface.co/onnx-community/Kokoro-82M-ONNX/resolve/main/onnx/model_uint8f16.onnx",
+            //"url": "../model_uint8f16.onnx",
+            "sha256": "071acda679aaa31dcd551c57dabb99190f5e126b2f76bf88621dfe69b2aa9a2d",
+            //"filename": "kokoro-v0_19.onnx",
+            //"url": "../kokoro-v0_19.onnx",
+        };
 
-    // Fetch the weights from the URL and parse them into
-    const rawWeights = await Fetcher.fetchFile(model_file);
+        // Fetch raw model weights
+        CONTEXT.rawModelData = await Fetcher.fetchFile(
+            model_file,
+            updateProgress,
+        );
 
-    const voices = [];
-    VOICES_FILES.forEach(async (voice) => {
-      voices.push(await Fetcher.fetchFile(voice));
-    });
-    
-    console.log(voices);
+        CONTEXT.voices = await fetchVoices(updateProgress);
+        CONTEXT.currentVoice = CONTEXT.voices[0];
 
+        // Parse raw weights into ONNX model
+        const onnxModel = loader.parseWeights(CONTEXT.rawModelData);
+        if (!onnxModel) {
+            throw new Error("Failed to parse ONNX model");
+        }
 
-    // The rawWeights are then parsed into an ONNXModel object based on the ONNX protobuf schema
-    const onnxModel = loader.parseWeights(rawWeights);
-    if (!onnxModel) {
-      throw new Error("Failed to parse ONNX model");
+        // Initialize ORT session
+        ort.env.debug = true;
+        ort.env.logLevel = "verbose";
+        CONTEXT.ortSession = await ort.InferenceSession.create(CONTEXT.rawModelData, {"executionProviders": ["wasm"]});
+
+        if (!CONTEXT.ortSession) {
+            throw new Error("Failed to create ONNX session");
+        }
+
+        console.log("Initialization completed:", CONTEXT);
+    } catch (error) {
+        console.error("Failed to initialize:", error);
+        throw error;
     }
-
-    //// Traverse onnxModel.graph!.input and print the name and shape of each input
-    //onnxModel.graph!.input.map((input) => {
-    //        const shape = input.type!.value.value.shape!;
-    //        console.log(`Input: `, shape);
-    //    });
-
-    const session = await new ort.InferenceSession(
-      rawWeights,
-      {
-        backendHint: "webgpu",
-      },
-    );
-
-    console.log(session);
-
-    const inputs = onnxModel.graph!.input;
-
-    // We must create dictionaries for the inputs and outputs
-    // inputs contains the key for the input, but the shape is nested within
-    // type -> value -> value -> shape -> dim
-    // we must extract the values from the dim array, and convert them to numbers from bigints
-    // the values are stored under 'value' -> 'value' for each element of the dim array
-
-    //const dict = {};
-    //inputs.forEach((input) => {
-    //  const shape = input.type!.value.value.shape!.dim.map((dim) =>
-    //    Number(dim.value!.value)
-    //  );
-    //  dict[input.name] = shape;
-    //});
-    //
-    //for (const [key, value] of Object.entries(dict)) {
-    //  console.log(`${key}: ${value}`);
-    //}
-
-    //const outputs = onnxModel.graph!.output;
-
-    //console.log("Inputs: ", inputs);
-
-    if (!session) {
-      throw new Error("Failed to create ONNX session");
-    }
-
-    const device = await WebGPUDevice.init();
-
-    console.log("Model Parsed!");
-  } catch (error) {
-    console.error("Failed to initialize:", error);
-    throw error;
-  }
 })();
+
