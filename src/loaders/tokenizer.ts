@@ -1,3 +1,6 @@
+// I put kokoro.py's phonemization logic into Claude and they converted it to TypeScript!
+// Then I had to add a vocab and tokenizer to encode the phonemes into tokens. (No huggingface autotokenizer here!)
+
 import { phonemize as espeakng } from "npm:phonemizer";
 
 function split(text: string, regex: RegExp): { match: boolean; text: string }[] {
