@@ -1,7 +1,7 @@
 import { Float16Array } from "@petamoriken/float16";
 import * as ort from "npm:onnxruntime-web/webgpu";
 import { GraphProto } from "./gen/onnx_pb.ts";
-import { WebGPUDevice } from "./webgpu/device.ts";
+import { AudioManager } from "./audio.ts";
 
 export interface FetchedFile {
     filename: string;
@@ -25,31 +25,19 @@ export interface Voice {
     name: string;
     filename: string;
     language: string;
-    data: ArrayBuffer | null;
+    data: Float32Array | null;
 }
 
 export interface KokoroContext {
     rawModelData: ArrayBuffer | null; // Stores the raw ONNX model weights
     ortSession: ort.InferenceSession | null; // Stores the ORT inference session
-    voices: Array<Voice>; // Array to store voice data
-    currentVoice: Voice | null; // Currently selected voice
-    audioCache: Array<CachedAudio>; // Array to store cached audio data
+    audioManager: AudioManager | null; // Stores the audio context
 }
 
 export interface CachedAudio {
-    key: string;
     data: ArrayBuffer;
     timestamp: number;
 }
-
-// Initialize the state object
-export const createKokoroContext = (): KokoroContext => ({
-    rawModelData: null,
-    ortSession: null,
-    voices: [],
-    currentVoice: null,
-    audioCache: [],
-});
 
 // Standard tokenizer configuration schema used by most Hugging Face models 
 export interface TokenizerConfig {
@@ -96,4 +84,12 @@ export interface TokenizerConfig {
         };
     };
 }
+
+// Initialize the state object
+export const createKokoroContext = (): KokoroContext => ({
+    rawModelData: null,
+    ortSession: null,
+    audioManager: null,
+});
+
 

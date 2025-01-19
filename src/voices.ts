@@ -76,15 +76,15 @@ const VOICES_FILES: Voice[] = [
 
 export const fetchVoices = async (
     updateProgress: (name: string, loaded: number, total: number) => void,
-): Promise<Voice[]> => {
-    const voices: Voice[] = [];
+): Promise<Map<string, Voice>> => {
+    const voices: Map<string, Voice> = new Map();
     for (let i = 0; i < VOICES_FILES.length; i++) {
         const file: FetchedFile = {
             "filename": VOICES_FILES[i].filename,
             "url": url + VOICES_FILES[i].filename,
         }
         const voiceData = await Fetcher.fetchFile(file, updateProgress);
-        voices.push({ ...VOICES_FILES[i], data: voiceData });
+        voices.set(VOICES_FILES[i].name, { ...VOICES_FILES[i], data: new Float32Array(voiceData) });
     }
     return voices;
 };

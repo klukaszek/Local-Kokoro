@@ -6,6 +6,7 @@ import { Fetcher } from "./loaders/files.ts";
 import { ONNXLoader } from "./loaders/onnx.ts";
 import { updateProgress } from "./ui/state/progress.ts";
 import { KokoroContext, createKokoroContext } from "./types.ts";
+import { AudioManager } from "./audio.ts";
 
 render(h(App, {}), document.getElementById("app")!);
 
@@ -20,10 +21,7 @@ export const CONTEXT: KokoroContext = createKokoroContext();
         const model_file = {
             "filename": "model_q8f16.onnx",
             "url": "https://huggingface.co/onnx-community/Kokoro-82M-ONNX/resolve/main/onnx/model_uint8f16.onnx",
-            //"url": "../model_uint8f16.onnx",
             "sha256": "071acda679aaa31dcd551c57dabb99190f5e126b2f76bf88621dfe69b2aa9a2d",
-            //"filename": "kokoro-v0_19.onnx",
-            //"url": "../kokoro-v0_19.onnx",
         };
 
         // Fetch raw model weights
@@ -32,8 +30,7 @@ export const CONTEXT: KokoroContext = createKokoroContext();
             updateProgress,
         );
 
-        CONTEXT.voices = await fetchVoices(updateProgress);
-        CONTEXT.currentVoice = CONTEXT.voices[0];
+        CONTEXT.audioManager = new AudioManager(await fetchVoices(updateProgress));
 
         // Parse raw weights into ONNX model
         const onnxModel = loader.parseWeights(CONTEXT.rawModelData);

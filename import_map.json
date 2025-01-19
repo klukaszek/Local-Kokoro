@@ -3,6 +3,7 @@
         "@bufbuild/protobuf": "npm:@bufbuild/protobuf@^2.2.3",
         "@bufbuild/protobuf/codegenv1": "npm:@bufbuild/protobuf@^2.2.3/codegenv1",
         "@petamoriken/float16": "jsr:@petamoriken/float16@^3.9.1",
+        "phonemizer": "npm:phonemizer@^1.2.1",
         "preact": "npm:preact@^10.25.4",
         "@preact/signals": "npm:@preact/signals@^2.0.1",
         "preact/hooks": "npm:preact@^10.25.4/hooks",
