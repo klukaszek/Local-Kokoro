@@ -159,7 +159,7 @@ function getVocab(): Record<string, number> {
 const VOCAB = getVocab();
 
 export function tokenize(text: string, vocab: Record<string, number>): number[] {
-  return Array.from(text).map((char) => vocab[char] ?? vocab["$"]); // Default to `$` if the character is not in the vocab
+  return Array.from(text).map((char) => vocab[char]); // Default to `$` if the character is not in the vocab
 }
 
 export async function encode(

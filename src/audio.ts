@@ -7,11 +7,12 @@ export class AudioManager {
     private webAudioContext: AudioContext | null;
     private readonly SAMPLE_RATE = 24000;  // Sample rate from your model
     private listeners: Map<string, (voices: Map<string, Voice>) => void> = new Map();
+    private voiceStr: string = "Default";
 
     constructor(voices: Map<string, Voice>) {
         this.audioCache = new Map();
         this.voices = voices;
-        this.currentVoice = voices.get("Default")!;
+        this.currentVoice = voices.get(this.voiceStr)!;
         this.webAudioContext = null;
     }
 
@@ -46,6 +47,7 @@ export class AudioManager {
 
     changeVoice(voiceName: string) {
         this.currentVoice = this.voices.get(voiceName) || this.voices.get("Default")!;
+        this.voiceStr = voiceName;
     }
 
     // Method to store audio data from model inference

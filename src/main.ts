@@ -32,14 +32,14 @@ export const CONTEXT: KokoroContext = await createKokoroContext();
             "sha256": "6e4e74139c6f1445f34428cad44206e8bdc7c4d703954d3248f5865c03379f86",
         };
 
-        // Fetch voices and initialize AudioManager
-        CONTEXT.audioManager = new AudioManager(await fetchVoices(updateProgress));
-
         // Fetch raw model weights
         CONTEXT.rawModelData = await Fetcher.fetchFile(
             model_file,
             updateProgress,
         );
+
+        // Fetch voices and initialize AudioManager
+        CONTEXT.audioManager = new AudioManager(await fetchVoices(updateProgress));
 
         // Parse raw weights into ONNX model
         const onnxModel = loader.parseWeights(CONTEXT.rawModelData);
