@@ -156,6 +156,7 @@ function getVocab(): Record<string, number> {
     vocab[symbol] = index;
   });
 
+
   return vocab;
 }
 
