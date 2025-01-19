@@ -6,6 +6,7 @@ export class AudioManager {
     private currentVoice: Voice | null;
     private webAudioContext: AudioContext | null;
     private readonly SAMPLE_RATE = 24000;  // Sample rate from your model
+    private listeners: Map<string, (voices: Map<string, Voice>) => void> = new Map();
 
     constructor(voices: Map<string, Voice>) {
         this.audioCache = new Map();
@@ -33,6 +34,10 @@ export class AudioManager {
 
     clearCache() {
         this.audioCache.clear();
+    }
+    
+    getVoices() {
+        return this.voices;
     }
 
     getCurrentVoice() {

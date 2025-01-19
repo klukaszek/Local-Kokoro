@@ -84,12 +84,3 @@ export interface TokenizerConfig {
         };
     };
 }
-
-// Initialize the state object
-export const createKokoroContext = (): KokoroContext => ({
-    rawModelData: null,
-    ortSession: null,
-    audioManager: null,
-});
-
-

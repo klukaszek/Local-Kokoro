@@ -5,7 +5,7 @@ import { FetchedFile } from "./types.ts";
 const url =
     "https://huggingface.co/onnx-community/Kokoro-82M-ONNX/resolve/main/voices/";
 
-const VOICES_FILES: Voice[] = [
+export const VOICES_FILES: Voice[] = [
     {
         "name": "Default",
         "filename": "af.bin",

@@ -17,7 +17,7 @@ export function MessageEncoder({ context }: MessageEncoderProps) {
     const [inferenceResult, setInferenceResult] = useState<string>("");
     const [isLoading, setIsLoading] = useState(false);
 
-    const handleInputChange = (event: Event) => {
+    const handleInputChange = async (event: Event) => {
         const target = event.target as HTMLInputElement;
         const newInput = target.value;
         setInput(newInput);
@@ -25,8 +25,9 @@ export function MessageEncoder({ context }: MessageEncoderProps) {
         const locale = context.audioManager?.getCurrentVoice()?.language === "en-us"
             ? "a"
             : "b";
-        const tokens = encode(newInput, locale, true);
-        setEncodedTokens(tokens);
+        const tokens = await encode(newInput, locale, true);
+        console.log(tokens.tokens);
+        setEncodedTokens(tokens.tokens);
     };
 
     const createTensorAndInfer = async () => {
