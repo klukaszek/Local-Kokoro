@@ -11,6 +11,11 @@ interface MessageEncoderProps {
     context: KokoroContext;
 }
 
+// TODO: Update component to only perform encoding when button is pressed by user.
+// Sort out more issues with weird cases of encoding: 
+// "Life is like a box of chocolates. You never know what you're gonna get".
+//              -> George, Sarah, and Emma fail to encode the "." at the end of the sentence.
+
 export function MessageEncoder({ context }: MessageEncoderProps) {
     const [input, setInput] = useState("");
     const [encodedTokens, setEncodedTokens] = useState<number[]>([]);
@@ -73,7 +78,7 @@ export function MessageEncoder({ context }: MessageEncoderProps) {
                 console.log(encodedTokens);
 
                 const paddedTokens = [0n, ...encodedTokensBigInt, 0n];
-                
+
                 // We generate our ONNX tensor from the padded tokens
                 const inputTensor = new ort.Tensor(
                     "int64",
@@ -86,12 +91,13 @@ export function MessageEncoder({ context }: MessageEncoderProps) {
                 // We generate our style tensor from the first token in the encoded tokens
                 const ref_s = new ort.Tensor(
                     "float32",
-                    voiceData?.slice(encodedTokens[0] * 256, ((encodedTokens[0]) + 1) * 256),
+                    voiceData?.slice(
+                        encodedTokens.length * 256,
+                        (encodedTokens.length + 1) * 256,
+                    )!,
                     [1, 256],
                 );
 
-                console.log(ref_s);
-                
                 const feeds = {
                     "input_ids": inputTensor,
                     "style": ref_s,
@@ -101,8 +107,13 @@ export function MessageEncoder({ context }: MessageEncoderProps) {
                 const results = await context.ortSession.run(feeds);
                 const audio = results[Object.keys(results)[0]].data as Float32Array;
                 audioManager.cacheAudioData(encodedTokens, audio);
+
+                console.log("TypeScript tokens:", paddedTokens);
+                console.log("TypeScript ref_s shape:", ref_s.dims);
+                console.log("TypeScript ref_s values:", ref_s.data);
+                console.log("TypeScript audio shape:", audio?.length);
+
                 setInferenceResult(`Inference complete! Audio length: ${audio.length}`);
-                
             }
         } catch (error) {
             setInferenceResult(`Error during inference: ${error.message}`);
