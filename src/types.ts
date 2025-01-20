@@ -37,6 +37,8 @@ export interface KokoroContext {
 export interface CachedAudio {
     data: ArrayBuffer;
     timestamp: number;
+    voice: string;
+    message: string;
 }
 
 // Standard tokenizer configuration schema used by most Hugging Face models 
